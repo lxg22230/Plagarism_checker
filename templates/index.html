@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Uploaded Files</title>
+    <style>
+      body {
+        background-color: #f8f9fa;
+        color: #343a40;
+      }
+      .container {
+        margin-top: 50px;
+      }
+      .file-list {
+        margin-top: 20px;
+      }
+      .file-list li {
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .upload-link {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center">Uploaded Files</h1>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="alert-container">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>File Name</th>
+            <th>Tag</th>
+            <th>Match</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for file in files %}
+            <tr>
+              <td>{{ file.filename }}</td>
+              <td>{{ file.week_tag }}</td>
+              <td>{{ (file.match or 0) | round(2) }}</td>
+              <td>Processed</td>
+              <td>
+                <a href="{{ url_for('uploaded_file', week_tag=file.week_tag, filename=file.filename) }}" class="btn btn-info btn-sm" target="_blank">View</a>
+                <form action="{{ url_for('delete_file', file_id=file.id) }}" method="post" style="display:inline;">
+                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="text-center upload-link">
+        <a href="{{ url_for('upload_file') }}" class="btn btn-primary">Upload a New File</a>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
