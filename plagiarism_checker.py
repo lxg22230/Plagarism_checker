@@ -1,10 +1,46 @@
 import os
-from difflib import SequenceMatcher
 import fitz  # PyMuPDF
 import docx
 from concurrent.futures import ThreadPoolExecutor
 
 from models import UploadedFile
+
+
+import re
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer
+
+
+def preprocess_text(text):
+    # Remove punctuation, special characters, and digits
+    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    # Convert to lowercase
+    text = text.lower()
+    # Tokenize the text into words
+    words = word_tokenize(text)
+    # Remove stop words
+    stop_words = set(stopwords.words('english'))
+    words = [word for word in words if word not in stop_words]
+    # Perform stemming
+    stemmer = PorterStemmer()
+    words = [stemmer.stem(word) for word in words]
+    return words
+
+def calculate_similarity(text1, text2):
+    # Preprocess the texts
+    words1 = preprocess_text(text1)
+    words2 = preprocess_text(text2)
+    
+    # Calculate the Jaccard similarity
+    set1 = set(words1)
+    set2 = set(words2)
+    intersection = len(set1 & set2)
+    union = len(set1 | set2)
+    similarity = intersection / union
+    
+    return similarity * 100
+
 
 def read_doc(file_path):
     doc = docx.Document(file_path)
@@ -35,8 +71,8 @@ def read_pdf(file_path):
     except Exception as e:
         print(f"Error reading PDF file {file_path}: {e}")
     return text
-def calculate_similarity(text1, text2):
-    return SequenceMatcher(None, text1, text2).ratio() * 100
+# def calculate_similarity(text1, text2):
+#     return SequenceMatcher(None, text1, text2).ratio() * 100
 
 def compare_files(new_file_path, file_path):
     if file_path == new_file_path:
