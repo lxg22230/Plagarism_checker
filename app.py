@@ -10,6 +10,7 @@ from functools import wraps
 
 
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import desc
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
@@ -24,7 +25,7 @@ def load_user(user_id):
 @app.route('/')
 def index():
     if current_user.is_authenticated:
-        files = current_user.files
+        files = UploadedFile.query.filter_by(user_id=current_user.id).order_by(desc(UploadedFile.upload_date)).all()
         if current_user.is_admin:
             users = User.query.all()
         else:

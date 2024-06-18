@@ -1,14 +1,24 @@
 import os
 from difflib import SequenceMatcher
 import fitz  # PyMuPDF
+import docx
 from concurrent.futures import ThreadPoolExecutor
 
 from models import UploadedFile
+
+def read_doc(file_path):
+    doc = docx.Document(file_path)
+    text = []
+    for paragraph in doc.paragraphs:
+        text.append(paragraph.text)
+    return '\n'.join(text)
 
 def read_file(file_path):
     try:
         if file_path.endswith('.pdf'):
             return read_pdf(file_path)
+        elif file_path.endswith('.doc') or file_path.endswith('.docx'):
+            return read_doc(file_path)
         else:
             with open(file_path, 'r', encoding='utf-8') as file:
                 return file.read()
@@ -25,7 +35,6 @@ def read_pdf(file_path):
     except Exception as e:
         print(f"Error reading PDF file {file_path}: {e}")
     return text
-
 def calculate_similarity(text1, text2):
     return SequenceMatcher(None, text1, text2).ratio() * 100
 

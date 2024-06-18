@@ -130,6 +130,7 @@
                 <th>Tag</th>
                 <th>Match</th>
                 <th>Matched File</th>
+                <th>Upload Time</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -140,6 +141,7 @@
                 <td>{{ file.week_tag }}</td>
                 <td>{{ (file.match or 0) | round(2) }}</td>
                 <td>{{ file.matched_file or 'N/A' }}</td>
+                <td>{{ file.upload_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                 <td>
                   <a href="{{ url_for('uploaded_file', week_tag=file.week_tag, filename=file.filename) }}" class="btn btn-info btn-sm" target="_blank">View</a>
                   <form action="{{ url_for('delete_file', file_id=file.id) }}" method="post" style="display:inline;">
