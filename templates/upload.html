@@ -47,16 +47,19 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="week_tag">Select Week</label>
-          <select class="form-control" id="week_tag" name="week_tag">
-            <option value="week1">Week 1</option>
-            <option value="week2">Week 2</option>
-            <option value="week3">Week 3</option>
-            <option value="week4">Week 4</option>
-          </select>
+            <label for="tag">Select a tag:</label>
+            <select class="form-control" id="tag" name="tag">
+                {% for tag in tags %}
+                    <option value="{{ tag.name }}">{{ tag.name }}</option>
+                {% endfor %}
+            </select>
         </div>
         <button type="submit" class="btn btn-primary">Upload</button>
       </form>
+        <!-- Add the button to navigate back to the home page -->
+        <div class="mt-3">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Home</a>
+    </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>

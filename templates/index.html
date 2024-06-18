@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <title>Uploaded Files</title>
+    <title>{% if current_user.is_admin %}User Management{% else %}Uploaded Files{% endif %}</title>
     <style>
       body {
         background-color: #f8f9fa;
@@ -25,55 +25,146 @@
       .upload-link {
         margin-top: 20px;
       }
+      /* Add these styles to the <style> section */
+      .match-low {
+        background-color: #d4edda; /* Green */
+      }
+
+      .match-medium {
+        background-color: #fff3cd; /* Yellow */
+      }
+
+      .match-high {
+        background-color: #f8d7da; /* Red */
+      }
+
+      /* New styles for the circled areas */
+      .welcome-text {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #007bff;
+      }
+
+      .logout-link {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #dc3545;
+      }
+
+      .header-title {
+        font-size: 2em;
+        font-weight: bold;
+        color: #28a745;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .admin-panel-link{
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #007bff;
+      }
+
+      /* Styles for table headers */
+      .table thead th {
+        background-color: #e3f2fd; /* Light blue */
+        color: #343a40;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1 class="text-center">Uploaded Files</h1>
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          <div class="alert-container">
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-            {% endfor %}
+      {% if current_user.is_authenticated %}
+        <div class="text-right">
+          <span class="welcome-text btn">Welcome, {{ current_user.username }}</span>
+          {% if current_user.is_admin %}
+            <a href="{{ url_for('admin_panel') }}" class="btn btn-link admin-panel-link">Admin Panel</a>
+          {% endif %}
+          <a href="{{ url_for('logout') }}" class="btn btn-link logout-link">Logout</a>
+        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="alert-container">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        {% if current_user.is_admin %}
+          <h1 class="header-title">User Management</h1>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in users %}
+                <tr>
+                  <td>{{ user.username }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>
+                    <form action="{{ url_for('delete_user', user_id=user.id) }}" method="post" style="display:inline;">
+                      <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <h1 class="header-title">Uploaded Files</h1>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>File Name</th>
+                <th>Tag</th>
+                <th>Match</th>
+                <th>Matched File</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for file in files %}
+              <tr class="{{ 'match-low' if (file.match or 0) < 50 else ('match-medium' if (file.match or 0) >= 50 and (file.match or 0) < 75 else 'match-high') }}">
+                <td>{{ file.filename }}</td>
+                <td>{{ file.week_tag }}</td>
+                <td>{{ (file.match or 0) | round(2) }}</td>
+                <td>{{ file.matched_file or 'N/A' }}</td>
+                <td>
+                  <a href="{{ url_for('uploaded_file', week_tag=file.week_tag, filename=file.filename) }}" class="btn btn-info btn-sm" target="_blank">View</a>
+                  <form action="{{ url_for('delete_file', file_id=file.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <div class="text-center upload-link">
+            <a href="{{ url_for('upload_file') }}" class="btn btn-primary">Upload a New File</a>
+          </div>
+          <!-- Add the button to navigate to the tags route -->
+          <div class="text-center mt-3">
+            <a href="{{ url_for('manage_tags') }}" class="btn btn-secondary">Manage Tags</a>
           </div>
         {% endif %}
-      {% endwith %}
-      <table class="table">
-        <thead>
-          <tr>
-            <th>File Name</th>
-            <th>Tag</th>
-            <th>Match</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for file in files %}
-            <tr>
-              <td>{{ file.filename }}</td>
-              <td>{{ file.week_tag }}</td>
-              <td>{{ (file.match or 0) | round(2) }}</td>
-              <td>Processed</td>
-              <td>
-                <a href="{{ url_for('uploaded_file', week_tag=file.week_tag, filename=file.filename) }}" class="btn btn-info btn-sm" target="_blank">View</a>
-                <form action="{{ url_for('delete_file', file_id=file.id) }}" method="post" style="display:inline;">
-                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                </form>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      <div class="text-center upload-link">
-        <a href="{{ url_for('upload_file') }}" class="btn btn-primary">Upload a New File</a>
-      </div>
+      {% else %}
+        <div class="text-center">
+          <p>Please login to access the uploaded files.</p>
+          <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
+          <a href="{{ url_for('signup') }}" class="btn btn-secondary">Sign Up</a>
+        </div>
+      {% endif %}
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
