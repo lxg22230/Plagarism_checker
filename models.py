@@ -13,7 +13,6 @@ class UploadedFile(db.Model):
     upload_date = db.Column(db.DateTime, default=datetime.utcnow)
     week_tag = db.Column(db.String(50), nullable=False)
     match = db.Column(db.Float, nullable=True)
-    # status = db.Column(db.String(50), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref=db.backref('files', lazy=True))
     matched_file = db.Column(db.String(200), nullable=True)
