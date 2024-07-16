@@ -70,8 +70,6 @@ def read_pdf(file_path):
     except Exception as e:
         print(f"Error reading PDF file {file_path}: {e}")
     return text
-# def calculate_similarity(text1, text2):
-#     return SequenceMatcher(None, text1, text2).ratio() * 100
 
 def compare_files(new_file_path, file_path):
     if file_path == new_file_path:
