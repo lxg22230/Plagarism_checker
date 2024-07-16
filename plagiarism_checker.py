@@ -31,14 +31,14 @@ def calculate_similarity(text1, text2):
     # Preprocess the texts
     words1 = preprocess_text(text1)
     words2 = preprocess_text(text2)
-    
+
     # Calculate the Jaccard similarity
     set1 = set(words1)
     set2 = set(words2)
     intersection = len(set1 & set2)
     union = len(set1 | set2)
     similarity = intersection / union
-    
+
     return similarity * 100
 
 
