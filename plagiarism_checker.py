@@ -53,11 +53,10 @@ def read_file(file_path):
     try:
         if file_path.endswith('.pdf'):
             return read_pdf(file_path)
-        elif file_path.endswith('.doc') or file_path.endswith('.docx'):
+        if file_path.endswith('.doc') or file_path.endswith('.docx'):
             return read_doc(file_path)
-        else:
-            with open(file_path, 'r', encoding='utf-8') as file:
-                return file.read()
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return file.read()
     except UnicodeDecodeError:
         with open(file_path, 'r', encoding='latin-1') as file:
             return file.read()

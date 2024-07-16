@@ -74,9 +74,8 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user)
             return redirect(url_for('index'))
-        else:
-            flash('Invalid email or password.', 'danger')
-            return redirect(url_for('login'))
+        flash('Invalid email or password.', 'danger')
+        return redirect(url_for('login'))
     return render_template('login.html', form=form)
 
 @app.route('/logout')
@@ -131,9 +130,8 @@ def upload_file():
             except Exception as e:
                 flash(f'An error occurred while saving the file: {e}', 'danger')
             return redirect(url_for('index'))
-        else:
-            flash('File type not allowed', 'danger')
-            return redirect(request.url)
+        flash('File type not allowed', 'danger')
+        return redirect(request.url)
     return render_template('upload.html', tags=tags)
 
 @app.route('/uploads/<week_tag>/<filename>')
@@ -148,16 +146,15 @@ def uploaded_file(week_tag, filename):
         response.headers['Content-Type'] = 'application/pdf'
         response.headers['Content-Disposition'] = f'inline; filename={filename}'
         return response
-    elif filename.endswith('.txt'):
+    if filename.endswith('.txt'):
         response = make_response(send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], week_tag), filename))
         response.headers['Content-Type'] = 'text/plain'
         response.headers['Content-Disposition'] = f'inline; filename={filename}'
         return response
-    elif filename.endswith('.docx') or filename.endswith('.doc'):
+    if filename.endswith('.docx') or filename.endswith('.doc'):
         # Serve DOCX and DOC files for download
         return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], week_tag), filename, as_attachment=True)
-    else:
-        return "Unsupported file type", 400
+    return "Unsupported file type", 400
 
 def admin_required(func):
     @wraps(func)
@@ -244,8 +241,7 @@ def edit_tag(tag_id):
             db.session.commit()
             flash('Tag updated successfully.', 'success')
             return redirect(url_for('manage_tags'))
-        else:
-            flash('Please enter a tag name.', 'danger')
+        flash('Please enter a tag name.', 'danger')
     return render_template('edit_tag.html', tag=tag)
 
 @app.route('/tags/delete/<int:tag_id>', methods=['POST'])
