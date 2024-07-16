@@ -109,8 +109,8 @@ def upload_file():
                 subdirectory = os.path.join(app.config['UPLOAD_FOLDER'], week_tag)
                 if not os.path.exists(subdirectory):
                     os.makedirs(subdirectory)
-                    
-                
+
+
                 filepath = os.path.join(subdirectory, filename)
                 file.save(filepath)
 
@@ -142,7 +142,7 @@ def uploaded_file(week_tag, filename):
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], week_tag, filename)
     if not os.path.exists(file_path):
         return "File not found", 404
-    
+
     if filename.endswith('.pdf'):
         response = make_response(send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], week_tag), filename))
         response.headers['Content-Type'] = 'application/pdf'
@@ -158,7 +158,7 @@ def uploaded_file(week_tag, filename):
         return send_from_directory(os.path.join(app.config['UPLOAD_FOLDER'], week_tag), filename, as_attachment=True)
     else:
         return "Unsupported file type", 400
-    
+
 def admin_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
@@ -166,7 +166,7 @@ def admin_required(func):
             return redirect(url_for('index'))
         return func(*args, **kwargs)
     return decorated_view
-    
+
 @app.route('/admin')
 @login_required
 @admin_required
